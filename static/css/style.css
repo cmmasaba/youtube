@@ -1,0 +1,28 @@
+body {
+  background-color: #e3f2fd;
+  width: 70%;
+  margin: 0 auto;
+  font-family: 'Signika', sans-serif;
+}
+
+header{
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 20px;
+  font-style: italic;
+}
+
+footer{
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 20px;
+  margin: 50px 10px 10px 10px;
+}
+
+.download-area {
+  width: 55%;
+  margin: 100px auto;
+}
+
+.select-video-playlist{
+  width: 30%;
+  margin: 70px auto;
+}

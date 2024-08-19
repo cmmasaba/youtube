@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Downloader</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F9F9F9;
+            padding-top: 60px;
+            color: #282828;
+        }
+        .navbar {
+            background-color: #FFFFFF;
+            border-bottom: 1px solid #E0E0E0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            color: #FF0000;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: #282828;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #FF0000;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+        .download-section {
+            margin-top: 2rem;
+            background-color: #FFF;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-control {
+            border-radius: 2rem;
+            border: 1px solid #E0E0E0;
+        }
+        .btn-primary {
+            background-color: #FF0000;
+            border-color: #FF0000;
+            border-radius: 2rem;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #D90000;
+            border-color: #D90000;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding: 1rem 0;
+            text-align: center;
+            background-color: #F1F1F1;
+            color: #606060;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <a class="navbar-brand" href="#">YouTube Downloader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container text-center">
+        <h1>Download YouTube Videos or Playlists</h1>
+        <p class="lead">Enter the URL of the YouTube video or playlist you want to download.</p>
+        
+        <div class="download-section">
+            <div class="form-group">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-outline-primary active">
+                        <input type="radio" name="downloadType" id="singleVideo" value="single" autocomplete="off" checked> Single Video
+                    </label>
+                    <label class="btn btn-outline-primary">
+                        <input type="radio" name="downloadType" id="playlist" value="playlist" autocomplete="off"> Playlist
+                    </label>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Enter YouTube URL here..." id="youtubeUrl">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="downloadButton">Download</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="formatSelect">Select Format:</label>
+                <select class="form-control" id="formatSelect">
+                    <option value="mp4">MP4</option>
+                    <option value="mp3">MP3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="qualitySelect">Select Quality:</label>
+                <select class="form-control" id="qualitySelect">
+                    <option value="1080p">1080p</option>
+                    <option value="720p">720p</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 YouTube Downloader. All rights reserved.</p>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.getElementById('downloadButton').addEventListener('click', function() {
+            const url = document.getElementById('youtubeUrl').value;
+            const format = document.getElementById('formatSelect').value;
+            const quality = document.getElementById('qualitySelect').value;
+            const downloadType = document.querySelector('input[name="downloadType"]:checked').value;
+    
+            if (url) {
+                const formData = new FormData();
+                formData.append('url', url);
+                formData.append('format', format);
+                formData.append('quality', quality);
+                formData.append('download_type', downloadType);
+    
+                fetch('/download/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'  // Ensure CSRF token is included for security
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    } else {
+                        return response.json().then(error => { throw new Error(error.error); });
+                    }
+                }).then(blob => {
+                    const url = window.URL.createObjectURL(new Blob([blob]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', downloadType === 'playlist' ? 'playlist.zip' : `video.${format}`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.parentNode.removeChild(link);
+                }).catch(error => {
+                    alert('Error: ' + error.message);
+                });
+            } else {
+                alert('Please enter a valid YouTube URL.');
+            }
+        });
+    </script>    
+</body>
+</html>
